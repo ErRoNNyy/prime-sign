@@ -52,13 +52,13 @@ export async function getMySigningHistory(): Promise<HistoryItem[]> {
 
 export async function openHistorySigningAction(formData: FormData) {
   const recipientId = String(formData.get("recipientId") ?? "");
-  if (!recipientId) return { error: "Missing recipient" };
+  if (!recipientId) throw new Error("Missing recipient");
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user?.email) return { error: "Unauthorized" };
+  if (!user?.email) throw new Error("Unauthorized");
 
   const admin = createAdminClient();
   const { data: recipient, error } = await admin
@@ -67,12 +67,12 @@ export async function openHistorySigningAction(formData: FormData) {
     .eq("id", recipientId)
     .maybeSingle();
 
-  if (error || !recipient) return { error: "Invitation not found" };
+  if (error || !recipient) throw new Error("Invitation not found");
   if (recipient.email.toLowerCase() !== user.email.toLowerCase()) {
-    return { error: "This invitation is not for your account" };
+    throw new Error("This invitation is not for your account");
   }
   if (recipient.status === "completed") {
-    return { error: "Already completed" };
+    throw new Error("Already completed");
   }
 
   const token = generateAccessToken();
@@ -80,7 +80,7 @@ export async function openHistorySigningAction(formData: FormData) {
     .from("recipients")
     .update({ access_token_hash: hashToken(token) })
     .eq("id", recipient.id);
-  if (updateErr) return { error: updateErr.message };
+  if (updateErr) throw new Error(updateErr.message);
 
   await writeAudit(
     recipient.envelope_id,
