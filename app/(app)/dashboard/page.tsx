@@ -26,7 +26,8 @@ export default async function DashboardPage() {
             Envelopes
           </h1>
           <p className="mt-1 text-sm text-muted">
-            Create, send, and track document workflows.
+            Documents you created and sent. Signing activity for you is under
+            History.
           </p>
         </div>
         <Link
