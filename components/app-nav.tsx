@@ -20,12 +20,6 @@ export function AppNav({ email }: { email: string }) {
               Envelopes
             </Link>
             <Link
-              href="/inbox"
-              className="rounded-md px-3 py-1.5 text-muted hover:bg-teal-50 hover:text-foreground"
-            >
-              Inbox
-            </Link>
-            <Link
               href="/contacts"
               className="rounded-md px-3 py-1.5 text-muted hover:bg-teal-50 hover:text-foreground"
             >
