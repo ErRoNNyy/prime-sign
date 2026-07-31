@@ -45,17 +45,36 @@ export async function stampFieldsOntoPdf(
         y,
         width: w,
         height: h,
-        borderColor: rgb(0.06, 0.46, 0.43),
-        borderWidth: 1.5,
-        color: rgb(0.94, 0.98, 0.96),
+        borderColor: rgb(0.15, 0.28, 0.12),
+        borderWidth: 2,
+        color: rgb(0.48, 0.55, 0.41),
       });
       const label = `Approved by ${field.recipientName ?? "signer"}`;
       page.drawText(label, {
         x: x + 4,
         y: y + h / 2 - 4,
-        size: Math.min(10, h * 0.4),
+        size: Math.min(11, h * 0.45),
         font,
-        color: rgb(0.06, 0.46, 0.43),
+        color: rgb(0.1, 0.13, 0.09),
+        maxWidth: w - 8,
+      });
+    } else if (field.type === "approve" && field.value === "false") {
+      page.drawRectangle({
+        x,
+        y,
+        width: w,
+        height: h,
+        borderColor: rgb(0.55, 0.12, 0.12),
+        borderWidth: 2,
+        color: rgb(0.75, 0.22, 0.22),
+      });
+      const label = `Denied by ${field.recipientName ?? "signer"}`;
+      page.drawText(label, {
+        x: x + 4,
+        y: y + h / 2 - 4,
+        size: Math.min(11, h * 0.45),
+        font,
+        color: rgb(1, 1, 1),
         maxWidth: w - 8,
       });
     }

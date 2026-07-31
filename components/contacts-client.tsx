@@ -13,6 +13,9 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+const inputClass =
+  "w-full border border-border bg-black/40 px-3 py-2 text-sm text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-sage";
+
 export function ContactsClient({ contacts }: { contacts: Contact[] }) {
   const {
     register,
@@ -38,9 +41,9 @@ export function ContactsClient({ contacts }: { contacts: Contact[] }) {
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      <div className="overflow-hidden border border-border bg-surface/70 backdrop-blur-sm">
         {!contacts.length ? (
-          <div className="px-6 py-12 text-center text-sm text-muted">
+          <div className="px-6 py-12 text-center text-sm text-ink-soft">
             No contacts yet. Add people you send envelopes to often.
           </div>
         ) : (
@@ -51,8 +54,8 @@ export function ContactsClient({ contacts }: { contacts: Contact[] }) {
                 className="flex items-center justify-between gap-3 px-4 py-3"
               >
                 <div>
-                  <p className="font-medium">{c.name}</p>
-                  <p className="text-sm text-muted">{c.email}</p>
+                  <p className="font-medium text-ink">{c.name}</p>
+                  <p className="text-sm text-ink-soft">{c.email}</p>
                 </div>
                 <button
                   type="button"
@@ -71,15 +74,16 @@ export function ContactsClient({ contacts }: { contacts: Contact[] }) {
 
       <form
         onSubmit={handleSubmit(onCreate)}
-        className="h-fit rounded-xl border border-border bg-surface p-5"
+        className="h-fit border border-border bg-surface/70 p-5 backdrop-blur-sm"
       >
-        <h2 className="font-semibold">Add contact</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-ink">
+          Add contact
+        </h2>
         <label className="mt-4 block text-sm">
-          <span className="mb-1 block font-medium">Name</span>
-          <input
-            {...register("name")}
-            className="w-full rounded-md border border-border px-3 py-2 outline-none focus:border-accent"
-          />
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            Name
+          </span>
+          <input {...register("name")} className={inputClass} />
           {errors.name && (
             <span className="mt-1 block text-xs text-danger">
               {errors.name.message}
@@ -87,12 +91,10 @@ export function ContactsClient({ contacts }: { contacts: Contact[] }) {
           )}
         </label>
         <label className="mt-3 block text-sm">
-          <span className="mb-1 block font-medium">Email</span>
-          <input
-            type="email"
-            {...register("email")}
-            className="w-full rounded-md border border-border px-3 py-2 outline-none focus:border-accent"
-          />
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            Email
+          </span>
+          <input type="email" {...register("email")} className={inputClass} />
           {errors.email && (
             <span className="mt-1 block text-xs text-danger">
               {errors.email.message}
@@ -105,7 +107,7 @@ export function ContactsClient({ contacts }: { contacts: Contact[] }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-4 w-full rounded-md bg-accent py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+          className="mt-4 w-full bg-sage py-2.5 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-sage-hover disabled:opacity-60"
         >
           {isSubmitting ? "Saving…" : "Save contact"}
         </button>

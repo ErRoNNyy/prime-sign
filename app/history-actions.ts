@@ -22,25 +22,34 @@ export async function getMySigningHistory(): Promise<HistoryItem[]> {
   } = await supabase.auth.getUser();
   if (!user?.email) return [];
 
+  const emailLower = user.email.trim().toLowerCase();
   const admin = createAdminClient();
+
+  // Load recipients + envelopes (admin bypasses RLS). Filter email in JS so
+  // addresses with "_" are matched exactly (SQL ILIKE treats "_" as wildcard).
   const { data, error } = await admin
     .from("recipients")
     .select(
       "*, envelopes(id, subject, status, created_at, sent_at, completed_at)",
     )
-    .ilike("email", user.email)
     .order("created_at", { ascending: false });
 
-  if (error || !data) return [];
+  if (error) {
+    console.error("getMySigningHistory:", error.message);
+    return [];
+  }
+  if (!data?.length) return [];
 
   const items: HistoryItem[] = [];
   for (const row of data) {
+    if (String(row.email ?? "").trim().toLowerCase() !== emailLower) continue;
+
     const { envelopes, ...recipient } = row as Recipient & {
       envelopes: HistoryItem["envelope"] | null;
     };
     if (!envelopes) continue;
-    // Skip drafts the user somehow appears on; only sent/in progress/completed/etc.
     if (envelopes.status === "draft") continue;
+
     items.push({
       recipient: recipient as Recipient,
       envelope: envelopes,

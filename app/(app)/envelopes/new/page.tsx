@@ -18,50 +18,55 @@ export default function NewEnvelopePage() {
     }
   }
 
+  const inputClass =
+    "w-full border border-border bg-black/40 px-3 py-2 text-sm text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-sage";
+
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="font-display text-3xl font-semibold tracking-tight">
+      <h1 className="font-display text-3xl font-medium italic tracking-tight text-ink">
         New envelope
       </h1>
-      <p className="mt-1 text-sm text-muted">
+      <p className="mt-1 text-sm text-ink-soft">
         Upload a PDF to start. You will add recipients and fields next.
       </p>
 
       <form
         action={onSubmit}
-        className="mt-8 space-y-5 rounded-xl border border-border bg-surface p-6"
+        className="mt-8 space-y-5 border border-border bg-surface/70 p-6 backdrop-blur-sm"
       >
         <label className="block text-sm">
-          <span className="mb-1 block font-medium">Subject</span>
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            Subject
+          </span>
           <input
             name="subject"
             placeholder="e.g. Q3 Vendor Agreement"
-            className="w-full rounded-md border border-border px-3 py-2 outline-none focus:border-accent"
+            className={inputClass}
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium">Message (optional)</span>
-          <textarea
-            name="message"
-            rows={3}
-            className="w-full rounded-md border border-border px-3 py-2 outline-none focus:border-accent"
-          />
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            Message (optional)
+          </span>
+          <textarea name="message" rows={3} className={inputClass} />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium">PDF document</span>
-          <div className="rounded-md border border-dashed border-border bg-teal-50/40 px-4 py-8 text-center">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.1em] text-ink-soft">
+            PDF document
+          </span>
+          <div className="border border-dashed border-border bg-black/30 px-4 py-8 text-center">
             <input
               name="file"
               type="file"
               accept="application/pdf"
               required
-              className="mx-auto block w-full max-w-xs text-sm"
+              className="mx-auto block w-full max-w-xs text-sm text-ink file:mr-3 file:border-0 file:bg-sage file:px-3 file:py-1.5 file:text-[0.68rem] file:font-bold file:uppercase file:tracking-[0.1em] file:text-on-accent"
               onChange={(e) =>
                 setFileName(e.target.files?.[0]?.name ?? null)
               }
             />
             {fileName && (
-              <p className="mt-2 text-sm text-muted">Selected: {fileName}</p>
+              <p className="mt-2 text-sm text-ink-soft">Selected: {fileName}</p>
             )}
           </div>
         </label>
@@ -69,7 +74,7 @@ export default function NewEnvelopePage() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-accent py-2.5 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+          className="w-full bg-sage py-2.5 text-[0.72rem] font-bold uppercase tracking-[0.12em] text-on-accent transition-colors hover:bg-sage-hover disabled:opacity-60"
         >
           {pending ? "Uploading…" : "Continue to prepare"}
         </button>

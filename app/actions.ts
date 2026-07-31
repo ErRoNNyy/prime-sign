@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getPdfPageCount } from "@/lib/pdf/stamp";
 import {
   sendEnvelope as sendEnvelopeCore,
   requestOtp as requestOtpCore,
   verifyOtp as verifyOtpCore,
   completeRecipientSigning,
+  getRecipientByToken,
   writeAudit,
 } from "@/lib/envelope/actions";
 
@@ -284,9 +286,15 @@ export async function sendEnvelopeAction(envelopeId: string) {
   redirect(`/envelopes/${envelopeId}`);
 }
 
-export async function requestOtpAction(token: string) {
+export async function requestOtpAction(
+  token: string,
+  options?: { force?: boolean },
+) {
   try {
-    return await requestOtpCore(token);
+    const result = await requestOtpCore(token, options);
+    revalidatePath("/dashboard");
+    revalidatePath("/history");
+    return result;
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Failed to send OTP" };
   }
@@ -294,7 +302,10 @@ export async function requestOtpAction(token: string) {
 
 export async function verifyOtpAction(token: string, code: string) {
   try {
-    return await verifyOtpCore(token, code);
+    const result = await verifyOtpCore(token, code);
+    revalidatePath("/dashboard");
+    revalidatePath("/history");
+    return result;
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Verification failed" };
   }
@@ -305,10 +316,114 @@ export async function submitSigningAction(
   fieldValues: Array<{ fieldId: string; value: string }>,
 ) {
   try {
-    return await completeRecipientSigning({ token, fieldValues });
+    const result = await completeRecipientSigning({ token, fieldValues });
+    const recipient = await getRecipientByToken(token);
+    revalidatePath("/dashboard");
+    revalidatePath("/history");
+    if (recipient?.envelope_id) {
+      revalidatePath(`/envelopes/${recipient.envelope_id}`);
+    }
+    if (result.completed) {
+      const download = await createFinalDownloadForToken(token);
+      if ("url" in download && download.url) {
+        return {
+          ...result,
+          url: download.url,
+          fileName: download.fileName,
+        };
+      }
+    }
+    return result;
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Signing failed" };
   }
+}
+
+export async function getCompletedEnvelopeDownloadUrl(envelopeId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user?.email) return { error: "Unauthorized" };
+
+  const admin = createAdminClient();
+  const { data: envelope } = await admin
+    .from("envelopes")
+    .select("id, created_by, status, documents(id, storage_path, file_name, is_final)")
+    .eq("id", envelopeId)
+    .maybeSingle();
+
+  if (!envelope) return { error: "Envelope not found" };
+
+  const isOwner = envelope.created_by === user.id;
+  if (!isOwner) {
+    const { data: recipient } = await admin
+      .from("recipients")
+      .select("id")
+      .eq("envelope_id", envelopeId)
+      .ilike("email", user.email)
+      .maybeSingle();
+    if (!recipient) return { error: "Unauthorized" };
+  }
+
+  if (envelope.status !== "completed") {
+    return { error: "Agreement is not fully completed yet" };
+  }
+
+  return createSignedDownloadFromDocuments(envelope.documents ?? []);
+}
+
+export async function getCompletedDocumentByToken(token: string) {
+  try {
+    return await createFinalDownloadForToken(token);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Download failed" };
+  }
+}
+
+async function createFinalDownloadForToken(token: string) {
+  const recipient = await getRecipientByToken(token);
+  if (!recipient) return { error: "Invalid signing link" };
+
+  const admin = createAdminClient();
+  const { data: envelope } = await admin
+    .from("envelopes")
+    .select("status, documents(id, storage_path, file_name, is_final)")
+    .eq("id", recipient.envelope_id)
+    .maybeSingle();
+
+  if (!envelope) return { error: "Envelope not found" };
+  if (envelope.status !== "completed") {
+    return { error: "Agreement is not fully completed yet" };
+  }
+
+  return createSignedDownloadFromDocuments(envelope.documents ?? []);
+}
+
+async function createSignedDownloadFromDocuments(
+  documents: Array<{
+    storage_path: string;
+    file_name: string;
+    is_final: boolean;
+  }>,
+) {
+  const finalDoc =
+    documents.find((d) => d.is_final) ??
+    documents[0];
+  if (!finalDoc) return { error: "No document available" };
+
+  const admin = createAdminClient();
+  const { data, error } = await admin.storage
+    .from("documents")
+    .createSignedUrl(finalDoc.storage_path, 60 * 30);
+  if (error || !data?.signedUrl) {
+    return { error: error?.message ?? "Could not create download link" };
+  }
+
+  return {
+    url: data.signedUrl,
+    fileName: finalDoc.file_name || "agreement-completed.pdf",
+  };
 }
 
 export async function getSignedDocumentUrl(storagePath: string) {

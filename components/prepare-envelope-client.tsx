@@ -256,23 +256,23 @@ export function PrepareEnvelopeClient(props: Props) {
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">
             Prepare envelope
           </p>
           <input
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="mt-1 w-full max-w-lg border-0 bg-transparent font-display text-3xl font-semibold tracking-tight outline-none"
+            className="mt-1 w-full max-w-lg border-0 bg-transparent font-display text-3xl font-medium italic tracking-tight text-ink outline-none"
           />
         </div>
         <div className="flex gap-2 text-sm">
           <span
-            className={`rounded-full px-3 py-1 ${step === "recipients" ? "bg-accent text-white" : "bg-teal-100 text-teal-900"}`}
+            className={`px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] ${step === "recipients" ? "bg-sage text-on-accent" : "bg-white/10 text-ink-soft"}`}
           >
             1. Recipients
           </span>
           <span
-            className={`rounded-full px-3 py-1 ${step === "fields" ? "bg-accent text-white" : "bg-zinc-100 text-zinc-600"}`}
+            className={`px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] ${step === "fields" ? "bg-sage text-on-accent" : "bg-white/10 text-ink-soft"}`}
           >
             2. Fields
           </span>
@@ -280,21 +280,21 @@ export function PrepareEnvelopeClient(props: Props) {
       </div>
 
       {error && (
-        <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-danger">
+        <p className="mt-4 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-danger">
           {error}
         </p>
       )}
 
       {step === "recipients" ? (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_280px]">
-          <div className="space-y-4 rounded-xl border border-border bg-surface p-5">
+          <div className="space-y-4 border border-border bg-surface/70 backdrop-blur-sm p-5">
             <label className="block text-sm">
               <span className="mb-1 block font-medium">Message to recipients</span>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={2}
-                className="w-full rounded-md border border-border px-3 py-2 outline-none focus:border-accent"
+                className="w-full border border-border bg-black/40 px-3 py-2 text-ink outline-none focus:border-sage"
               />
             </label>
             {recipients.map((r, index) => (
@@ -312,7 +312,7 @@ export function PrepareEnvelopeClient(props: Props) {
                       ),
                     )
                   }
-                  className="rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-accent"
+                  className="border border-border bg-black/40 px-3 py-2 text-sm text-ink outline-none focus:border-sage"
                 />
                 <input
                   placeholder="Email"
@@ -325,7 +325,7 @@ export function PrepareEnvelopeClient(props: Props) {
                       ),
                     )
                   }
-                  className="rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-accent"
+                  className="border border-border bg-black/40 px-3 py-2 text-sm text-ink outline-none focus:border-sage"
                 />
                 <select
                   value={r.role}
@@ -341,12 +341,12 @@ export function PrepareEnvelopeClient(props: Props) {
                       ),
                     )
                   }
-                  className="rounded-md border border-border px-2 py-2 text-sm"
+                  className="border border-border bg-black/40 px-2 py-2 text-sm text-ink"
                 >
                   <option value="signer">Signer</option>
                   <option value="approver">Approver</option>
                 </select>
-                <div className="flex items-center gap-2 text-sm text-muted">
+                <div className="flex items-center gap-2 text-sm text-ink-soft">
                   <span>#{index + 1}</span>
                   <button
                     type="button"
@@ -365,7 +365,7 @@ export function PrepareEnvelopeClient(props: Props) {
             <button
               type="button"
               onClick={addBlankRecipient}
-              className="text-sm font-medium text-accent hover:underline"
+              className="text-sm font-medium text-sage hover:underline"
             >
               + Invite by email
             </button>
@@ -374,17 +374,17 @@ export function PrepareEnvelopeClient(props: Props) {
                 type="button"
                 disabled={pending}
                 onClick={() => void persistRecipients()}
-                className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+                className="bg-sage px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-on-accent hover:bg-sage-hover disabled:opacity-60"
               >
                 {pending ? "Saving…" : "Continue to fields"}
               </button>
             </div>
           </div>
 
-          <aside className="h-fit rounded-xl border border-border bg-surface p-4">
+          <aside className="h-fit border border-border bg-surface/70 backdrop-blur-sm p-4">
             <h2 className="text-sm font-semibold">From contacts</h2>
             {!props.contacts.length ? (
-              <p className="mt-2 text-sm text-muted">No contacts saved.</p>
+              <p className="mt-2 text-sm text-ink-soft">No contacts saved.</p>
             ) : (
               <ul className="mt-3 max-h-80 space-y-2 overflow-auto">
                 {props.contacts.map((c) => (
@@ -392,10 +392,10 @@ export function PrepareEnvelopeClient(props: Props) {
                     <button
                       type="button"
                       onClick={() => addFromContact(c)}
-                      className="w-full rounded-md border border-border px-3 py-2 text-left text-sm hover:bg-teal-50"
+                      className="w-full rounded-md border border-border px-3 py-2 text-left text-sm hover:bg-white/5"
                     >
                       <span className="block font-medium">{c.name}</span>
-                      <span className="text-muted">{c.email}</span>
+                      <span className="text-ink-soft">{c.email}</span>
                     </button>
                   </li>
                 ))}
@@ -405,9 +405,9 @@ export function PrepareEnvelopeClient(props: Props) {
         </div>
       ) : (
         <div className="mt-6 grid gap-6 lg:grid-cols-[240px_1fr]">
-          <aside className="h-fit space-y-4 rounded-xl border border-border bg-surface p-4">
+          <aside className="h-fit space-y-4 border border-border bg-surface/70 backdrop-blur-sm p-4">
             <div>
-              <p className="text-xs font-medium uppercase text-muted">
+              <p className="text-xs font-medium uppercase text-ink-soft">
                 Place for
               </p>
               <ul className="mt-2 space-y-1">
@@ -420,8 +420,8 @@ export function PrepareEnvelopeClient(props: Props) {
                         onClick={() => setActiveRecipientId(r.id!)}
                         className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm ${
                           activeRecipientId === r.id
-                            ? "bg-teal-50 font-medium"
-                            : "hover:bg-zinc-50"
+                            ? "bg-sage/20 font-medium text-ink"
+                            : "hover:bg-white/5"
                         }`}
                       >
                         <span
@@ -435,7 +435,7 @@ export function PrepareEnvelopeClient(props: Props) {
               </ul>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-muted">
+              <p className="text-xs font-medium uppercase text-ink-soft">
                 Field type
               </p>
               <div className="mt-2 flex flex-col gap-2">
@@ -444,7 +444,7 @@ export function PrepareEnvelopeClient(props: Props) {
                   onClick={() => setPlaceType("signature")}
                   className={`rounded-md border px-3 py-2 text-sm ${
                     placeType === "signature"
-                      ? "border-accent bg-teal-50"
+                      ? "border-sage bg-sage/20"
                       : "border-border"
                   }`}
                 >
@@ -455,14 +455,14 @@ export function PrepareEnvelopeClient(props: Props) {
                   onClick={() => setPlaceType("approve")}
                   className={`rounded-md border px-3 py-2 text-sm ${
                     placeType === "approve"
-                      ? "border-accent bg-teal-50"
+                      ? "border-sage bg-sage/20"
                       : "border-border"
                   }`}
                 >
                   Approve / Agree
                 </button>
               </div>
-              <p className="mt-3 text-xs text-muted">
+              <p className="mt-3 text-xs text-ink-soft">
                 Click on the PDF to place a field.
               </p>
             </div>
@@ -494,7 +494,7 @@ export function PrepareEnvelopeClient(props: Props) {
               <button
                 type="button"
                 onClick={() => setStep("recipients")}
-                className="rounded-md border border-border px-3 py-2 text-sm"
+                className="border border-border px-3 py-2 text-sm text-ink"
               >
                 Back
               </button>
@@ -502,7 +502,7 @@ export function PrepareEnvelopeClient(props: Props) {
                 type="button"
                 disabled={pending}
                 onClick={() => void persistFieldsAndSend(false)}
-                className="rounded-md border border-border px-3 py-2 text-sm hover:bg-teal-50 disabled:opacity-60"
+                className="border border-border px-3 py-2 text-sm text-ink hover:bg-white/5 disabled:opacity-60"
               >
                 Save draft
               </button>
@@ -510,18 +510,18 @@ export function PrepareEnvelopeClient(props: Props) {
                 type="button"
                 disabled={pending}
                 onClick={() => void persistFieldsAndSend(true)}
-                className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+                className="bg-sage px-3 py-2 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-on-accent hover:bg-sage-hover disabled:opacity-60"
               >
                 {pending ? "Sending…" : "Send envelope"}
               </button>
             </div>
           </aside>
 
-          <div className="space-y-6 overflow-auto rounded-xl border border-border bg-zinc-100 p-4">
+          <div className="space-y-6 overflow-auto border border-border bg-black/40 p-4">
             <Document
               file={props.pdfUrl}
               onLoadSuccess={({ numPages: n }) => setNumPages(n)}
-              loading={<p className="text-sm text-muted">Loading PDF…</p>}
+              loading={<p className="text-sm text-ink-soft">Loading PDF…</p>}
               error={<p className="text-sm text-danger">Failed to load PDF</p>}
             >
               {Array.from({ length: numPages }, (_, i) => i + 1).map((page) => (
@@ -539,7 +539,7 @@ export function PrepareEnvelopeClient(props: Props) {
                     .map((f) => (
                       <div
                         key={f.key}
-                        className="absolute cursor-pointer border-2 bg-white/70 text-[10px] font-semibold"
+                        className="absolute cursor-pointer border-2 bg-black/50 text-[10px] font-semibold"
                         style={{
                           left: `${f.x_pct}%`,
                           top: `${f.y_pct}%`,

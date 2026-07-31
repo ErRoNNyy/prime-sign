@@ -57,17 +57,32 @@ export default async function SignPage({
   }
 
   return (
-    <div className="min-h-full flex-1 bg-[radial-gradient(ellipse_at_top,_#ccfbf1,_#f4f7f6_55%)] px-3 py-8 sm:px-6">
-      <SignClient
-        token={token}
-        recipientName={recipient.name}
-        recipientEmail={recipient.email}
-        subject={envelope.subject}
-        pdfUrl={signed?.signedUrl ?? ""}
-        fields={(fields ?? []) as Field[]}
-        alreadyVerified={recipient.status === "otp_verified"}
-        alreadyCompleted={recipient.status === "completed"}
+    <div className="relative isolate min-h-dvh flex-1 overflow-x-hidden bg-[#0a0a0a] px-3 py-8 text-ink sm:px-6">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 50% at 15% 0%, rgba(122,139,105,0.14), transparent 55%), radial-gradient(ellipse 60% 45% at 90% 10%, rgba(212,198,185,0.08), transparent 50%), linear-gradient(180deg, #0c0b0a 0%, #0a0a0a 45%, #0e0d0b 100%)",
+        }}
       />
+      <div
+        className="pointer-events-none absolute inset-2.5 z-30 border border-ink/15 sm:inset-3"
+        aria-hidden
+      />
+      <div className="relative z-10">
+        <SignClient
+          token={token}
+          recipientName={recipient.name}
+          recipientEmail={recipient.email}
+          subject={envelope.subject}
+          pdfUrl={signed?.signedUrl ?? ""}
+          fields={(fields ?? []) as Field[]}
+          alreadyVerified={recipient.status === "otp_verified"}
+          alreadyCompleted={recipient.status === "completed"}
+          envelopeCompleted={envelope.status === "completed"}
+        />
+      </div>
     </div>
   );
 }

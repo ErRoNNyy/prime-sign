@@ -179,7 +179,11 @@ export async function getRecipientByToken(token: string) {
   return recipient as Recipient | null;
 }
 
-export async function requestOtp(token: string) {
+export async function requestOtp(
+  token: string,
+  options?: { force?: boolean },
+) {
+  const force = Boolean(options?.force);
   const recipient = await getRecipientByToken(token);
   if (!recipient) throw new Error("Invalid signing link");
   if (recipient.status === "completed") throw new Error("Already completed");
@@ -199,6 +203,32 @@ export async function requestOtp(token: string) {
   );
   if (!current || current.id !== recipient.id) {
     throw new Error("It is not your turn to sign yet");
+  }
+
+  // Reuse a freshly issued challenge so double-mount / duplicate requests
+  // don't invalidate the code the user already received.
+  const { data: existing } = await admin
+    .from("otp_challenges")
+    .select("*")
+    .eq("recipient_id", recipient.id)
+    .is("consumed_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const OTP_REUSE_WINDOW_MS = 90_000;
+  if (
+    !force &&
+    existing &&
+    Date.now() - new Date(existing.created_at).getTime() < OTP_REUSE_WINDOW_MS
+  ) {
+    return {
+      ok: true as const,
+      email: recipient.email,
+      emailSent: true,
+      reused: true as const,
+    };
   }
 
   const code = generateOtpCode();
@@ -401,7 +431,16 @@ export async function completeRecipientSigning(params: {
     .eq("id", recipient.id);
 
   const signed = fieldList.some((f) => f.type === "signature");
-  const approved = fieldList.some((f) => f.type === "approve");
+  const approved = params.fieldValues.some(
+    (fv) =>
+      fieldList.some((f) => f.id === fv.fieldId && f.type === "approve") &&
+      fv.value === "true",
+  );
+  const denied = params.fieldValues.some(
+    (fv) =>
+      fieldList.some((f) => f.id === fv.fieldId && f.type === "approve") &&
+      fv.value === "false",
+  );
   if (signed) {
     await writeAudit(
       recipient.envelope_id,
@@ -415,6 +454,15 @@ export async function completeRecipientSigning(params: {
     await writeAudit(
       recipient.envelope_id,
       "approved",
+      recipient.email,
+      { recipient_id: recipient.id },
+      true,
+    );
+  }
+  if (denied) {
+    await writeAudit(
+      recipient.envelope_id,
+      "denied",
       recipient.email,
       { recipient_id: recipient.id },
       true,
