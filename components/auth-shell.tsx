@@ -27,7 +27,7 @@ export function AuthShell({
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[50%_32%] scale-[1.08] translate-y-[4%]"
+          className="object-cover object-[62%_40%] scale-[1.06]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,0.88)_0%,rgba(8,8,8,0.72)_45%,rgba(8,8,8,0.78)_100%),linear-gradient(180deg,rgba(8,8,8,0.7)_0%,rgba(8,8,8,0.45)_40%,rgba(8,8,8,0.85)_100%)]" />
       </div>

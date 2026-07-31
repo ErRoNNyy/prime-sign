@@ -57,11 +57,7 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="animate-landing-bg 
-          object-cover object-[50%_32%] 
-          motion-reduce:animate-none 
-          motion-reduce:scale-[1.00] 
-          motion-reduce:translate-y-[7%]"
+          className="mt-20 animate-landing-bg object-cover object-[42%_40%] motion-reduce:animate-none motion-reduce:scale-[1.00] motion-reduce:translate-y-0"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,0.78)_0%,rgba(8,8,8,0.42)_42%,rgba(8,8,8,0.28)_100%),linear-gradient(180deg,rgba(8,8,8,0.55)_0%,transparent_28%,transparent_58%,rgba(8,8,8,0.72)_100%)]" />
       </div>
