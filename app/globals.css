@@ -22,8 +22,18 @@
   --color-accent-hover: var(--accent-hover);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
+  --color-sage: #7a8b69;
+  --color-sage-deep: #5f6d52;
+  --color-sage-hover: #879872;
+  --color-sage-arrow-hover: #4f5b44;
+  --color-ink: #d4c6b9;
+  --color-ink-soft: rgb(212 198 185 / 0.72);
   --font-sans: var(--font-source-sans);
   --font-display: var(--font-fraunces);
+  --animate-landing-bg: landing-bg-drift 28s ease-in-out infinite alternate;
+  --animate-landing-up: landing-fade-up 1s ease both;
+  --animate-landing-down: landing-fade-down 0.9s ease both;
+  --animate-landing-serif: landing-serif-in 1.15s 0.35s ease both;
 }
 
 body {
@@ -34,4 +44,46 @@ body {
 
 .font-display {
   font-family: var(--font-fraunces), Georgia, serif;
+}
+
+@keyframes landing-bg-drift {
+  from {
+    transform: scale(1.12) translate3d(0, 7%, 0);
+  }
+  to {
+    transform: scale(1.18) translate3d(-0.8%, 5.5%, 0);
+  }
+}
+
+@keyframes landing-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-serif-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) skewX(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) skewX(0);
+  }
 }
